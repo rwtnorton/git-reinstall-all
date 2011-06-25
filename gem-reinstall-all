@@ -1,0 +1,14 @@
+#!/bin/bash
+
+#
+# Iterates through list of locally installed gems, munges the list into
+# a new list where each version of a gem is on its own line (in a format
+# readily consumed by `gem install`), and reinstalls each gem with --force.
+#
+
+exec gem list --local \
+|ruby -nle '
+  d = /^([^ ]+) \((.*)\)/.match($_) or next
+  n, vs = d[1..2]
+  vs.split(/, /).each {|v| puts "#{n} -v #{v}" }' \
+|xargs gem install --force
